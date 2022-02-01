@@ -21,6 +21,8 @@ interface CaptureDescription {
     latitude: number,
     longitude: number,
     zoom: number,
+    chosen_lat: number,
+    chosen_lng: number
 }
 
 // Utils
@@ -71,8 +73,8 @@ async function capture_picture ( capture : CaptureDescription ){
         captureBeyondViewport: false,
         zoomFactor: 0.1,
         defaultViewport: {
-            width:4000,
-            height:4000,
+            width:6000,
+            height:6000,
             isMobile: true,
         }
     })
@@ -81,7 +83,7 @@ async function capture_picture ( capture : CaptureDescription ){
     const page = (await puppet.pages())[0]
 
     // Wait for page to load
-    await page.goto (`http://localhost:8080/?lat=${capture.latitude}&lng=${capture.longitude}&zoom=${capture.zoom}`)
+    await page.goto (`http://localhost:8080/?lat=${capture.chosen_lat}&lng=${capture.chosen_lng}&zoom=${capture.zoom}`)
     await wait(5)
 
     // Capture
@@ -117,7 +119,7 @@ app.post('/next', async function (req, res) {
         state: next_city[3],
         latitude: next_city[6],
         longitude: next_city[7],
-        zoom: 11,
+        zoom: 12,
     }
     res.send(JSON.stringify(response))
 })

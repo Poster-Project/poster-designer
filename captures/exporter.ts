@@ -19,6 +19,7 @@ async function do_export () {
         if ( ! captures.includes(id)) {
     
             const data = fs.readFileSync(`../working-data/positioning/${pos}`)
+            
             await fetch(`http://localhost:8080/capture`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

@@ -18,10 +18,10 @@
         }
         #finder {
             width : 400px;
-            height: 540px;
+            height: 400px;
             position: absolute;
             left: calc(50% - 200px);
-            top: calc(50% - 270px);
+            top: calc(50% - 200px);
             border: 4px solid rgb(255, 38, 0);
             display: none;
             pointer-events: none;
@@ -37,33 +37,20 @@
         const queryString = window.location.search
         const parameters = new URLSearchParams(queryString)
             
-        const sent_lat = +parameters.get('lat') ?? 40.7127837
-        const sent_lng = +parameters.get('lng') ?? -74.0059413
-        const sent_zoom = +parameters.get('zoom') ?? 11
+        const sent_lat = +parameters.get('lat') || 40.7127837
+        const sent_lng = +parameters.get('lng') || -74.0059413
+        const sent_zoom = +parameters.get('zoom') || 12
 
-        console.log(sent_lat, sent_lng, sent_zoom)
+        console.log({sent_lat, sent_lng, sent_zoom})
 
         const keys = {
             LEFTSHIFT: 16,
             KEY_S: 83,
             KEY_N: 78,
+            KEY_I: 73,
             RETURN: 13
         }
         
-        // Utility to have map pull a new city from csv
-        function jumpToNext (){
-            fetch('/next', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' }
-            }).then(res => res.json()).then(data => {
-                document.getElementById('finder').style.display = 'block'
-                recorded_sizing = data
-                is_sizing = true
-                map.setCenter({ lat: data.latitude, lng: data.longitude });
-                map.setZoom(data.zoom)
-            });
-        }
-
         // Run map itselef
         function initMap() {
             
@@ -76,8 +63,15 @@
                 disableDefaultUI: true
             })
 
+
             // Load functionality on keypress
             window.onkeydown = function(e) {
+
+                // Log info on I
+                if (e.keyCode == keys.KEY_I) {
+                    console.log(map.getCenter().lat(), map.getCenter().lng())
+                    console.log(map.getZoom())
+                }
 
                 // Left-shift allows you to enter a lat-lng to teleport to
                 if (e.keyCode == keys.LEFTSHIFT) {
@@ -86,8 +80,8 @@
                     let center = prompt("Where to?")
                     let [a,b] = center.split(',')
                     
-                    let lat = a.replace(/[^0-9\.]/g, '')
-                    let lng = b.replace(/[^0-9\.]/g, '')
+                    let lat = a.replace(/[^0-9\.\-]/g, '')
+                    let lng = b.replace(/[^0-9\.\-]/g, '')
 
                     if (a.includes('S')) { lat = -(+lat) }
                     if (b.includes('W')) { lng = -(+lng) }
@@ -110,14 +104,23 @@
                             city_name: 'debugsville',
                             latitude: center.lat(),
                             longitude: center.lng(),
-                            zoom: 14 + (zoom-11)
+                            zoom: 13 + (zoom-12)
                         })
                     });
                 }
 
                 // N jumps to next city that needs charting
                 if (e.keyCode == keys.KEY_N) {
-                    jumpToNext()
+                    fetch('/next', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    }).then(res => res.json()).then(data => {
+                        document.getElementById('finder').style.display = 'block'
+                        recorded_sizing = data
+                        is_sizing = true
+                        map.setCenter({ lat: +data.latitude, lng: +data.longitude });
+                        map.setZoom(data.zoom)
+                    });
                 }
 
                 // Record the current view as valid
@@ -136,11 +139,11 @@
                             headers: { 'Content-Type': 'application/json'},
                             body: JSON.stringify({
                                 ...recorded_sizing,
-                                lat: center.lat(),
-                                lng: center.lng(),
-                                zoom: 14 + (map.getZoom()-11)
+                                chosen_lat: center.lat(),
+                                chosen_lng: center.lng(),
+                                zoom: 15 + (map.getZoom()-11)
                             })
-                        }).then( jumpToNext )
+                        })
                     }
                 }
             };
