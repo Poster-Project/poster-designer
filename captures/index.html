@@ -1,0 +1,154 @@
+<!--
+    Main index page for the captures.
+    Runs multiple operations dependent on the URL and query string.
+-->
+
+<head>
+    
+    <!-- External Resources -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly&channel=2" async></script>
+    <style>
+        #map, #img {
+            position: relative;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #finder {
+            width : 400px;
+            height: 540px;
+            position: absolute;
+            left: calc(50% - 200px);
+            top: calc(50% - 270px);
+            border: 4px solid rgb(255, 38, 0);
+            display: none;
+            pointer-events: none;
+        }
+    </style>
+
+    <!-- Internal Resources -->
+    <script>
+
+        let recorded_sizing = {}
+        let is_sizing = false
+
+        const queryString = window.location.search
+        const parameters = new URLSearchParams(queryString)
+            
+        const sent_lat = +parameters.get('lat') ?? 40.7127837
+        const sent_lng = +parameters.get('lng') ?? -74.0059413
+        const sent_zoom = +parameters.get('zoom') ?? 11
+
+        console.log(sent_lat, sent_lng, sent_zoom)
+
+        const keys = {
+            LEFTSHIFT: 16,
+            KEY_S: 83,
+            KEY_N: 78,
+            RETURN: 13
+        }
+        
+        // Utility to have map pull a new city from csv
+        function jumpToNext (){
+            fetch('/next', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            }).then(res => res.json()).then(data => {
+                document.getElementById('finder').style.display = 'block'
+                recorded_sizing = data
+                is_sizing = true
+                map.setCenter({ lat: data.latitude, lng: data.longitude });
+                map.setZoom(data.zoom)
+            });
+        }
+
+        // Run map itselef
+        function initMap() {
+            
+            console.log("Loading Map")
+
+            const map = new google.maps.Map(document.getElementById("map"), {
+                mapId: "c2d302dc23ceb159",
+                center: { lat: sent_lat, lng: sent_lng },
+                zoom:  sent_zoom,
+                disableDefaultUI: true
+            })
+
+            // Load functionality on keypress
+            window.onkeydown = function(e) {
+
+                // Left-shift allows you to enter a lat-lng to teleport to
+                if (e.keyCode == keys.LEFTSHIFT) {
+
+                    // set map position basted on prompt
+                    let center = prompt("Where to?")
+                    let [a,b] = center.split(',')
+                    
+                    let lat = a.replace(/[^0-9\.]/g, '')
+                    let lng = b.replace(/[^0-9\.]/g, '')
+
+                    if (a.includes('S')) { lat = -(+lat) }
+                    if (b.includes('W')) { lng = -(+lng) }
+
+                    map.setCenter({ lat: +lat,  lng: +lng });
+                }
+
+                // S allows you to take a picture of the current view
+                if (e.keyCode == keys.KEY_S) {
+                
+                    const center = map.getCenter();
+                    const zoom = map.getZoom();
+
+                    fetch('/capture', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            state: 'debug',
+                            state_code: 'NAN',
+                            city_name: 'debugsville',
+                            latitude: center.lat(),
+                            longitude: center.lng(),
+                            zoom: 14 + (zoom-11)
+                        })
+                    });
+                }
+
+                // N jumps to next city that needs charting
+                if (e.keyCode == keys.KEY_N) {
+                    jumpToNext()
+                }
+
+                // Record the current view as valid
+                if (e.keyCode == keys.RETURN) {
+
+                    const center = map.getCenter();
+
+                    if ( is_sizing ) {
+
+                        is_sizing = false
+                        document.getElementById('finder').style.display = 'none'
+
+                        // Record the current view as valid for the api
+                        fetch('/record', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json'},
+                            body: JSON.stringify({
+                                ...recorded_sizing,
+                                lat: center.lat(),
+                                lng: center.lng(),
+                                zoom: 14 + (map.getZoom()-11)
+                            })
+                        }).then( jumpToNext )
+                    }
+                }
+            };
+        }
+    </script>
+</head>
+
+<body>
+    <div id="map" onload="initMap()"></div>
+    <div id="finder"></div>
+</body>
