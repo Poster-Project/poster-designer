@@ -55,7 +55,7 @@ function file_name (city : string, state: string) {
 async function find_next( cities : any[] ) {
     for ( let city of cities ) {
         const save_name = file_name(city[0], city[2])
-        const exists = fs.existsSync(`../working-data/positioning/${save_name}`)
+        const exists = fs.existsSync(`../working-data/positioning/${save_name}.json`)
         if (exists) continue
         return city
     }
@@ -84,7 +84,7 @@ async function capture_picture ( capture : CaptureDescription ){
 
     // Wait for page to load
     await page.goto (`http://localhost:8080/?lat=${capture.chosen_lat}&lng=${capture.chosen_lng}&zoom=${capture.zoom}`)
-    await wait(5)
+    await wait(15)
 
     // Capture
     verify_dir_exists(save_dir)
