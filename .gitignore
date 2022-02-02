@@ -2,3 +2,4 @@
 captures/node_modules
 working-data/captures/**/*.json
 working-data/captures/**/*.png
+working-data/exports/**/*.png
