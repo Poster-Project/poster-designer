@@ -84,7 +84,7 @@ async function capture_picture ( capture : CaptureDescription ){
 
     // Wait for page to load
     await page.goto (`http://localhost:8080/?lat=${capture.chosen_lat}&lng=${capture.chosen_lng}&zoom=${capture.zoom}`)
-    await wait(15)
+    await wait(7)
 
     // Capture
     verify_dir_exists(save_dir)
