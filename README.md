@@ -26,3 +26,13 @@ Screenshots saved in '/working-data' will be converted to posters and then saved
 cd designing
 python runner.py
 ```
+
+
+## S3 interfacing
+
+Interface with the cloud to store and retrieve files
+
+```
+cd cloud
+python sync.py
+```
