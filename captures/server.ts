@@ -7,10 +7,18 @@
 */
 
 import express from 'express';
+import {spawn} from 'child_process'
 import open from 'open';
 import puppeteer from 'puppeteer';
 import fs from 'fs';
 import {parse} from 'csv-parse';
+
+const params = {
+    launched: false,
+    puppet: null as any,
+    width : 6000,
+    height : 6000,
+}
 
 // Types
 
@@ -24,6 +32,7 @@ interface CaptureDescription {
     chosen_lat: number,
     chosen_lng: number
 }
+
 
 // Utils
 
@@ -50,6 +59,25 @@ function file_name (city : string, state: string) {
     return `${small_city}-${small_state}`;
 }
 
+async function launch_puppet() {
+    if (params.launched) return
+    const puppet = await puppeteer.launch({
+        headless:false,
+        devtools: true,
+        //@ts-ignore
+        captureBeyondViewport: true,
+        zoomFactor: 0.1,
+        args: ['--no-sandbox', '--incognito'],
+        defaultViewport: {
+            width: params.width,
+            height: params.height,
+            isMobile: true,
+        }
+    })
+    params.launched = true
+    params.puppet = puppet
+}
+
 // Features
 
 async function find_next( cities : any[] ) {
@@ -63,40 +91,62 @@ async function find_next( cities : any[] ) {
 
 async function capture_picture ( capture : CaptureDescription ){
 
+    // File values
     const save_name = file_name(capture.city_name, capture.state_code)
     const save_dir = `../working-data/captures/${save_name}`
 
-    const puppet = await puppeteer.launch({
-        headless:false,
-        devtools: true,
-        //@ts-ignore
-        captureBeyondViewport: false,
-        zoomFactor: 0.1,
-        defaultViewport: {
-            width:6000,
-            height:6000,
-            isMobile: true,
-        }
-    })
+    // Run Values
+    let page_loaded = false
+    let page_errored = false
+    
+    // Start
+    console.log(`Loading ${save_name} . . .`)
 
     // Open Page
-    const page = (await puppet.pages())[0]
+    const page = (await params.puppet.pages())[0]
 
     // Wait for page to load
-    await page.goto (`http://localhost:8080/?lat=${capture.chosen_lat}&lng=${capture.chosen_lng}&zoom=${capture.zoom}`)
-    await wait(15)
+    let url = `http://localhost:8080/?lat=${capture.chosen_lat}&lng=${capture.chosen_lng}&zoom=${capture.zoom}`
+    await page.goto (url, { waitUntil: 'networkidle2' })
+        .then(() => {
+            page_loaded = true
+        })
+        .catch(() => {
+            page_errored = true
+        })
+    await wait(5)
+
+    // If errored
+    if (page_errored) {
+        console.log(`Error loading ${save_name}`)
+        return
+    }
 
     // Capture
     verify_dir_exists(save_dir)
-    await page.screenshot({path: `${save_dir}/raw.png`});
+    const watchDog = page
+      .mainFrame()
+      .waitForFunction(`window.innerWidth === ${params.width} && window.innerHeight === ${params.height} `)
+
+    await page.setViewport({width: params.width, height: params.height})
+    await watchDog
+    await page.screenshot({path: `${save_dir}/raw.png`, fullPage: true})
     await wait(1)
 
     // Write Data
     const save_data = JSON.stringify(capture, null, 2)
     fs.writeFileSync(`${save_dir}/info.json`, save_data) 
-    
-    await puppet.close();
 
+    // Spawn purger if needed
+    await wait(1)
+    const ls = spawn('python', ['./checkandpurge.py', save_name]);
+    ls.stdout.on('data', (data) => {
+        console.log(`Purger: ${data}`);
+    });
+    ls.stderr.on('data', (data) => {
+        console.log(`Purger: ${data}`);
+    });
+    ls.on('close', async (code) => { });
 }
 
 // Create express app
@@ -106,6 +156,7 @@ app.use(express.json());
 app.use(express.static(__dirname)); 
 
 app.post('/capture', async function (req, res) {
+    await launch_puppet()
     await capture_picture(req.body)
     res.send('done');
 })
