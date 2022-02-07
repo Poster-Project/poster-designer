@@ -126,4 +126,3 @@ for i in images:
     os.makedirs(new_dir, exist_ok=True)
 
     save(result, new_dir + "/save")
-    break

@@ -3,3 +3,5 @@ captures/node_modules
 working-data/captures/**/*.json
 working-data/captures/**/*.png
 working-data/exports/**/*.png
+working-data/final-images
+cloud/keys.json
