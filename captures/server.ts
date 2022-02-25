@@ -104,9 +104,10 @@ async function capture_picture ( capture : CaptureDescription ){
 
     // Open Page
     const page = (await params.puppet.pages())[0]
+    await wait(1)
 
     // Wait for page to load
-    let url = `http://localhost:8080/?lat=${capture.chosen_lat}&lng=${capture.chosen_lng}&zoom=${capture.zoom}`
+    let url = `http://localhost:8080/?lat=${capture.chosen_lng}&lng=${capture.chosen_lat}&zoom=${capture.zoom}`
     await page.goto (url, { waitUntil: 'networkidle2' })
         .then(() => {
             page_loaded = true
@@ -130,23 +131,23 @@ async function capture_picture ( capture : CaptureDescription ){
 
     await page.setViewport({width: params.width, height: params.height})
     await watchDog
-    await page.screenshot({path: `${save_dir}/raw.png`, fullPage: true})
     await wait(1)
+    await page.screenshot({path: `${save_dir}/raw.png`, fullPage: true})
 
     // Write Data
     const save_data = JSON.stringify(capture, null, 2)
     fs.writeFileSync(`${save_dir}/info.json`, save_data) 
 
     // Spawn purger if needed
-    await wait(1)
-    const ls = spawn('python', ['./checkandpurge.py', save_name]);
-    ls.stdout.on('data', (data) => {
-        console.log(`Purger: ${data}`);
-    });
-    ls.stderr.on('data', (data) => {
-        console.log(`Purger: ${data}`);
-    });
-    ls.on('close', async (code) => { });
+    // await wait(1)
+    // const ls = spawn('python', ['./checkandpurge.py', save_name]);
+    // ls.stdout.on('data', (data) => {
+    //     console.log(`Purger: ${data}`);
+    // });
+    // ls.stderr.on('data', (data) => {
+    //     console.log(`Purger: ${data}`);
+    // });
+    // ls.on('close', async (code) => { });
 }
 
 // Create express app
