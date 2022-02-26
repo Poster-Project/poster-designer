@@ -1,5 +1,7 @@
 # Image Capture Repo
 
+See S3 info [here](./docs/S3.md)
+
 ## Getting Screenshots
 
 Start the local server with:

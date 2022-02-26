@@ -4,7 +4,7 @@
     "name": "OpenStreetMap",
     "sources": {
         "openmaptiles": {
-            "url": "https://api.maptiler.com/tiles/v3-openmaptiles/tiles.json?key=a8pvGnJGI7rkOKPR0zDE",
+            "url": "./tileData.json",
             "type": "vector"
         }
     },
@@ -1116,7 +1116,7 @@
                 "visibility": "visible"
             },
             "paint": {
-                "fill-color": "#aad3df"
+                "fill-color": "#850c36"
             },
             "metadata": {},
             "filter": [

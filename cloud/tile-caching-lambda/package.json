@@ -1,0 +1,20 @@
+{
+  "scripts": {
+    "deploy": "env-cmd --file .env.creds sls deploy",
+    "deploy-f": "env-cmd --file .env.creds sls deploy -f get",
+    "logs-f": "env-cmd --file .env.creds sls logs -f get",
+    "test": "env-cmd --file .env.creds env-cmd --file .env node src/get-test.js"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1082.0",
+    "brotli": "^1.3.2",
+    "env-cmd": "^10.1.0",
+    "request": "^2.88.2",
+    "requests": "^0.3.0",
+    "serverless-iam-roles-per-function": "^3.2.0",
+    "zlib": "^1.0.5"
+  },
+  "devDependencies": {
+    "serverless-dotenv-plugin": "^3.12.2"
+  }
+}

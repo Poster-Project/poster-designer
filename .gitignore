@@ -5,3 +5,4 @@ working-data/captures/**/*.png
 working-data/exports/**/*.png
 working-data/final-images
 cloud/keys.json
+captures/Pipfile
