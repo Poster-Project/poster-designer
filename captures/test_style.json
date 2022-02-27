@@ -4,7 +4,7 @@
     "name": "OpenStreetMap",
     "sources": {
         "openmaptiles": {
-            "url": "./tileData.json",
+            "url": "https://poster-boi-data-dump.s3.amazonaws.com//public/tileset-description.json",
             "type": "vector"
         }
     },
