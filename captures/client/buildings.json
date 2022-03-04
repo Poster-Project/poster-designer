@@ -1,0 +1,74 @@
+{
+    "version": 8,
+    "id": "openstreetmap",
+    "name": "OpenStreetMap",
+    "sources": {
+        "openmaptiles": {
+            "url": "https://poster-boi-data-dump.s3.amazonaws.com//public/tileset-description.json",
+            "type": "vector"
+        }
+    },
+    "layers": [
+        {
+            "id": "background",
+            "type": "background",
+            "layout": { "visibility": "visible" },
+            "paint": { "background-color": "#0E0E0E"}
+        },
+        {
+            "id": "water",
+            "type": "fill",
+            "source": "openmaptiles",
+            "source-layer": "water",
+            "layout": {
+                "visibility": "visible"
+            },
+            "paint": {
+                "fill-color": "#000000"
+            },
+            "metadata": {},
+            "filter": [
+                "all",
+                [
+                    "!=",
+                    "intermittent",
+                    1
+                ],
+                [
+                    "!=",
+                    "brunnel",
+                    "tunnel"
+                ]
+            ]
+        },
+        {
+            "id": "building",
+            "type": "fill",
+            "source": "openmaptiles",
+            "source-layer": "building",
+            "minzoom": 8,
+            "maxzoom": 24,
+            "layout": {
+                "visibility": "visible"
+            },
+            "paint": {
+                "fill-color": "#5A5A5A",
+                "fill-outline-color": "#FFFFFF"
+            },
+            "metadata": {}
+        }
+
+    ],
+    "metadata": {
+        "maptiler:copyright": "This style was generated on MapTiler Cloud. Usage outside of MapTiler Cloud requires valid MapTiler Data Package: https://www.maptiler.com/data/package/ -- please contact us."
+    },
+    "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=a8pvGnJGI7rkOKPR0zDE",
+    "sprite": "https://api.maptiler.com/maps/openstreetmap/sprite",
+    "bearing": 0,
+    "pitch": 0,
+    "center": [
+        2.8655946968546004,
+        22.80535462569901
+    ],
+    "zoom": 0.7418741168636303
+}

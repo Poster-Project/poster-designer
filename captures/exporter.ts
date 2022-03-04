@@ -46,6 +46,8 @@ async function do_export () {
 
     }
 
+    fetch(`http://localhost:8080/done`, {})
+
 }
 
 do_export()

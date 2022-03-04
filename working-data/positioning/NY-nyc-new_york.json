@@ -1,0 +1,11 @@
+{
+  "city_name": "New York",
+  "state_code": "NY",
+  "state": "New York",
+  "latitude": "-73.9249",
+  "longitude": "40.6943",
+  "zoom": 17,
+  "chosen_lat": 40.73983815753709,
+  "chosen_lng": -73.9901313232422,
+  "custom_name": "nyc"
+}
