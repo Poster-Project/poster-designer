@@ -5,9 +5,9 @@ import fs from 'fs';
 // Values
 
 const config = {
-    useHeadless : true,
-    width : 7000,
-    height : 7000,
+    useHeadless : false,
+    width : 10000,
+    height : 10000,
 }
 
 const state = {
@@ -107,7 +107,7 @@ async function capture_picture ( capture : CaptureDescription ){
     await page.setViewport({width: config.width, height: config.height})
     //@ts-ignore
     await waitUntil(() => page.evaluate(() => document._mapLoaded ))
-    await wait(1)
+    await wait(10)
 
     // Write Data
     verify_dir_exists(save_dir)

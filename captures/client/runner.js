@@ -47,44 +47,27 @@ function run () {
 
     // Do listen for loading
 
-    var numInFlightTiles = 0;
-    map.getLayers().forEach(function (layer) {
-        console.log(layer)
-        var source = layer.getSource();
-        if (source instanceof ol.source.TileImage) {
-            source.on('tileloadstart', function () {++numInFlightTiles; console.log(numInFlightTiles)})
-            source.on('tileloadend', function () {--numInFlightTiles;  console.log(numInFlightTiles)})
+    setTimeout(() => {
+        let rendered = false
+        map.getLayers().getArray()[0].on('postrender', () => {
+            console.log('post-render')
+            rendered = true
+        })
+        const wait = () => {
+            if (!rendered){
+                console.log('done')
+                document._mapLoaded = true
+            }
+            else setTimeout(wait, 2000)
+            rendered = false
         }
-    })
-
-    map.on('postrender', function (evt) {
-        if (!evt.frameState)
-            return;
-
-        var numHeldTiles = 0;
-        var wanted = evt.frameState.wantedTiles;
-        for (var layer in wanted)
-            if (wanted.hasOwnProperty(layer))
-                numHeldTiles += Object.keys(wanted[layer]).length;
-
-        var ready = numInFlightTiles === 0 && numHeldTiles === 0;
-        if (map.get('ready') !== ready)
-            map.set('ready', ready);
-    });
-
-    map.set('ready', false);
-
-    function whenMapIsReady(callback) {
-        if (map.get('ready'))
-            callback();
-        else
-            map.once('change:ready', whenMapIsReady.bind(null, callback));
-    }
+        setTimeout(wait, 2000)
+    }, 100)
 
     setTimeout(() => {
         whenMapIsReady(() => {
             document._mapLoaded = true
-            console.log('done')
+            
         })
     }, 100)
 
