@@ -86,8 +86,8 @@ def style_faded_chin_border(use_image, text1, text2 ):
     _canvas[:use_width, :width,2] = np.maximum(_canvas[:use_width, :width,2], _border.T)
 
     # Add Font
-    _with_font = add_text(_canvas, font="Jura-Medium.ttf", text=text1, x=width//2, y=height-620,size=250,color=(255,255,255))
-    _canvas = add_text(_with_font, font="Jura-Light.ttf", text=text2, x=width//2, y=height-300, size=125)
+    _with_font = add_text(_canvas, font="Jura-Medium.ttf", text=text1, x=width//2, y=height-820,size=350,color=(255,255,255))
+    _canvas = add_text(_with_font, font="Jura-Light.ttf", text=text2, x=width//2, y=height-400, size=225)
 
     # Border
     add_border(_canvas, 50, 12, 0)
@@ -102,6 +102,7 @@ def style_faded_chin_border(use_image, text1, text2 ):
 
 # List all images in '../working-data/captures'
 images = glob.glob('../working-data/captures/**/*.png')
+print(images)
 for i in images:
 
     # Load image
@@ -110,7 +111,7 @@ for i in images:
     # Load info.json
     info = json.load(open(i.replace('raw.png','info.json')))
 
-    city_name = info['city_name']
+    city_name = info['city_name'] + ', ' + info['state_code']
     lat = info['chosen_lat']
     lng = info['chosen_lng']
 
@@ -125,4 +126,5 @@ for i in images:
     new_dir = i.replace('/captures','/exports')[:-8]
     os.makedirs(new_dir, exist_ok=True)
 
-    save(result, new_dir + "/save")
+    save(result, new_dir + "/light")
+    save(1-result, new_dir + "/dark")

@@ -52,10 +52,10 @@ async function load_CSV (fileName : string) {
     return rows
 }
 
-function file_name (city : string, state: string, custom:string) {
+function file_name (city : string, state: string) {
     const small_city = city.replace(/\s/g, '_').toLowerCase()
     const small_state = state.replace(/\s/g, '_').toLowerCase()
-    return `${custom}-${small_city}-${small_state}`;
+    return `${small_city}-${small_state}`;
 }
 
 async function get_puppet() {
@@ -81,7 +81,8 @@ async function get_puppet() {
 
 async function find_next( cities : any[] ) {
     for ( let city of cities ) {
-        const save_name = file_name('', city[0], city[2])
+        console.log(city)
+        const save_name = file_name(city[0], city[2])
         const exists = fs.existsSync(`../working-data/positioning/${save_name}.json`)
         if (exists) continue
         return city
@@ -91,7 +92,7 @@ async function find_next( cities : any[] ) {
 async function capture_picture ( capture : CaptureDescription ){
 
     // File values
-    const save_name = file_name(capture.custom_name, capture.city_name, capture.state_code)
+    const save_name = file_name(capture.city_name, capture.state_code)
     const save_dir = `../working-data/captures/${save_name}`
 
     // Start
@@ -148,7 +149,8 @@ app.post('/next', async function (req, res) {
 })
 
 app.post('/record', async function (req, res) {
-    const save_name = file_name(req.body.custom_name, req.body.city_name, req.body.state_code) 
+    console.log(req.body)
+    const save_name = file_name(req.body.city_name, req.body.state_code) 
     const output_path = `../working-data/positioning/${save_name}.json`
     fs.writeFileSync(output_path, JSON.stringify(req.body, null, 2))
     res.send('done')

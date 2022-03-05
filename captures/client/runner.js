@@ -5,9 +5,11 @@ let is_sizing = false
 const queryString = window.location.search
 const parameters = new URLSearchParams(queryString)
     
-const sent_lat = +parameters.get('lat') || -74.0059413
-const sent_lng = +parameters.get('lng') || 40.7127837
+const sent_lat = +parameters.get('lat') || -122.3321
+const sent_lng = +parameters.get('lng') || 47.6062
 const sent_zoom = +parameters.get('zoom') || 12
+const sent_style = parameters.get('style') || 'roads'
+
 
 const keys = {
     LEFTSHIFT: 16,
@@ -42,7 +44,7 @@ function run () {
         controls: []
     })
     map = new ol.Map({ target: 'map', view: MapView })
-    olms.apply(map, '/buildings.json');
+    olms.apply(map, `/${sent_style}.json`);
     map.getControls().forEach(function(control) { map.removeControl(control)}, this);
 
     // Do listen for loading
@@ -122,7 +124,8 @@ function run () {
                 headers: { 'Content-Type': 'application/json' }
             }).then(res => res.json()).then(data => {
                 document.getElementById('finder').style.display = 'block'
-                recorded_sizing = data
+                recorded_sizing = data//{"city_name":"--","state_code":"-","state":"-","latitude":sent_lat,"longitude":sent_lng,"zoom":12}
+                console.log(data)
                 is_sizing = true
                 console.log(data)
                 jump_to(+data.latitude, +data.longitude, data.zoom)
@@ -133,7 +136,7 @@ function run () {
         if (e.keyCode == keys.RETURN) {
 
             const center = describe()
-            const name = prompt("Any special name?")
+            //const name = prompt("Any special name?")
 
             if ( is_sizing ) {
 
@@ -148,7 +151,7 @@ function run () {
                         ...recorded_sizing,
                         chosen_lat: center.lat,
                         chosen_lng: center.lng,
-                        custom_name : name,
+                        //custom_name : name,
                         zoom: 16 + (center.zoom-11)
                     })
                 })
