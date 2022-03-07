@@ -1,0 +1,15 @@
+{
+  "country": "USA",
+  "region": "New York",
+  "region_code": "NY",
+  "city": "New York",
+  "area": "New York",
+  "longitude": -73.97742838134764,
+  "latitude": 40.74816176596323,
+  "zoom": 16,
+  "caption_method": "city-regionCode",
+  "caption_string": "New York, NY",
+  "date_created": "2022-03-07T20:54:24.484Z",
+  "style": "roads",
+  "hash": 1990721541
+}

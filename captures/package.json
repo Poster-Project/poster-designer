@@ -1,7 +1,7 @@
 {
     "scripts": {
-        "start": "ts-node server.ts --transpile-only",
-        "export": "ts-node exporter.ts --transpile-only"
+        "start": "ts-node ./server/server.ts --transpile-only",
+        "export": "ts-node ./server/exporter.ts --transpile-only"
     },
     "devDependencies": {
         "@types/express": "^4.17.13",
