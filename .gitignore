@@ -6,3 +6,7 @@ working-data/exports/**/*.png
 working-data/final-images
 cloud/keys.json
 captures/Pipfile
+_local/raw_pictures
+_local/exports
+keys.json
+_local

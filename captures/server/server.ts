@@ -36,6 +36,7 @@ export default class Server {
         // Open Page
         const puppet = await this.launch_puppet()
         const page = (await puppet.pages())[0]
+        page.setDefaultNavigationTimeout(0); 
         await T.wait(1)
 
         // Describe poster

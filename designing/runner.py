@@ -44,7 +44,12 @@ def add_text ( a, font="", text="", x=0, y=0, size=50, color=(255,255,255)):
 def save (a, i):
     _ = np.uint8(a*255)
     img = Image.fromarray(_, 'RGB')
-    img.save(f"{i}.png")
+    img.save(f"{i}-full.png")
+
+    width_scale = a.shape[0] / 2000
+    small = cv2.resize(_, (int(a.shape[1] // width_scale), 2000), interpolation = cv2.INTER_AREA)
+    img = Image.fromarray(small, 'RGB')
+    img.save(f"{i}-small.png")
 
 def add_border (a, inset, width, color):
     
@@ -101,30 +106,27 @@ def style_faded_chin_border(use_image, text1, text2 ):
 
 
 # List all images in '../working-data/captures'
-images = glob.glob('../working-data/captures/**/*.png')
-print(images)
-for i in images:
+sources = glob.glob('../_local/saved_positions/*.json')
 
-    # Load image
-    img = cv2.imread(i) / 255
+for i in sources:
 
-    # Load info.json
-    info = json.load(open(i.replace('raw.png','info.json')))
-
-    city_name = info['city_name'] + ', ' + info['state_code']
-    lat = info['chosen_lat']
-    lng = info['chosen_lng']
-
+    # Load json
+    name = os.path.basename(i).split('.')[0]
+    info = json.load(open(i))
+    lat = info['latitude']
+    lng = info['longitude']
+    
+    # Load file
+    img = cv2.imread(f"../_local/raw_pictures/{info['hash']}-{info['style']}.png") / 255
+    
     # Format lat and lng as string
     lat_str = str(lat)[:6] + '° ' + 'N' if lat > 0 else 'S'
     lng_str = str(lng)[:6] + '° ' + 'W' if lat > 0 else 'E'
 
     # Get result
-    result = style_faded_chin_border(img, city_name, f"{lat_str}   {lng_str}")
+    result = style_faded_chin_border(img, info['caption_string'], f"{lat_str}   {lng_str}")
 
     # Save out to exports folder
-    new_dir = i.replace('/captures','/exports')[:-8]
-    os.makedirs(new_dir, exist_ok=True)
+    os.makedirs(f"../_local/exports/{name}", exist_ok=True)
 
-    save(result, new_dir + "/light")
-    save(1-result, new_dir + "/dark")
+    save(1-result, f"../_local/exports/{name}/{info['style']}")

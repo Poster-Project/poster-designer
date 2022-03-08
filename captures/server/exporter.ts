@@ -35,7 +35,7 @@ async function do_export () {
         
     }
 
-    fetch(`http://localhost:8080/done`, {})
+    fetch(`http://localhost:3000/done`, {})
 
 }
 

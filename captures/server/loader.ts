@@ -28,7 +28,7 @@ export async function find_next() {
             latitude : +city[7],
         }
 
-        const save_name = T.name_file(info)
+        const save_name = T.name_file(info) + '.json'
     
         if ( created.includes(save_name) ) continue
         return info
