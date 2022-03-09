@@ -15,11 +15,11 @@ function default_center () {
     return {
         longitude : request.longitude || -122.3321,
         latitude : request.latitude || 47.6062,
-        zoom : request.zoom || 12
+        zoom : request.zoom || 14
     }
 }
 function default_style () {
-    return request.style || 'roads'
+    return request.style || 'test-style'
 }
 
 function describe_map ( ) {

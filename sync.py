@@ -37,7 +37,7 @@ def confirm (message):
 def get_root_question ():
     return ask(
         'What would you like to do?',
-        ['Upload to S3', 'Download from S3', 'Quit']
+        ['Upload to S3', 'Download from S3', 'Generate File URLS', 'Quit']
     )
 
 def upload_what ():
@@ -195,3 +195,35 @@ if _ == 1:
     if _ == 2:
         quit()
 
+# File URLS
+if _ == 2:
+
+    base_url = "https://poster-boi-data-dump.s3.amazonaws.com//exports/{file}/{style}-{type}.png"
+    results = {}
+
+    _files = glob.glob('./_local/saved_positions/*.*')
+    for i in _files:
+
+        with open(i) as f: _data = json.load(f)
+        del _data['style']
+        label = i.split('/')[-1].split('.')[0]
+        _export_files = glob.glob('./_local/exports/' + label + '/*.*')
+
+        results[label] = {
+            "metadata" : _data,
+            "styles" : {}
+        }
+
+        for f in _export_files:
+            style = f.split('/')[-1].split('-')[0]
+            results[label]['styles'][style] = {
+                "full" : base_url.format(file=label, style=style, type='full'),
+                "small" : base_url.format(file=label, style=style, type='small')
+            }
+
+        
+    ## write results to file
+    with open('./_local/index.json', 'w') as f:
+        json.dump(results, f, indent=4)
+    
+    print(colored('\nSuccess', 'magenta'))

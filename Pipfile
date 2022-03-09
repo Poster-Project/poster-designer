@@ -7,6 +7,8 @@ name = "pypi"
 boto3 = "*"
 inquirer = "*"
 termcolor = "*"
+jupyterlab = "*"
+jupyter = "*"
 
 [dev-packages]
 
